@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.egg-info/
+*.log
+
+# Environments
+.env
+.venv/
+venv/
+ENV/
+env.bak/
+env/
+
+# Jupyter / IPython
+.ipynb_checkpoints
+
+# Streamlit
+.streamlit/
+uploads/
+cache/
+
+# VS Code / Codespaces
+.vscode/
+*.code-workspace
+
+# Mac / Linux / Windows junk
+.DS_Store
+Thumbs.db
