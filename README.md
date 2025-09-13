@@ -1,26 +1,21 @@
-# 🔍 PhishEye – Scam Image & Screenshot Detector  
+# 🕵️‍♂️ PhishEye – Vision-Language Phishing Detection  
 
-PhishEye is a **vision-powered cybersecurity tool** built during **Hack02: LFMs with Eyes 👀**.  
-It detects scam screenshots, fake bank alerts, and fraudulent receipts by combining **Vision-Language AI** with **OCR text analysis**.  
-
----
-
-## 🚀 Features  
-- 📂 Upload screenshots, alerts, or receipts  
-- 👁️ Vision-Language Model (LFM2-VL / BLIP) generates captions & context  
-- 🔤 OCR (Tesseract) extracts embedded text from images  
-- ⚠️ Scam detection using **keyword + pattern analysis**  
-- ✅ Verdict with explanation (Safe vs Scam)  
-- 📊 Expander shows **AI caption & extracted text** for transparency  
+PhishEye is an AI-powered security tool built for **Hack02: LFMs with Eyes 👀**.  
+It uses **LFM2-VL (Liquid Foundation Model 2 – Vision Language)** + OCR to detect phishing attempts in text and screenshots.  
 
 ---
 
-## 🛠️ Tech Stack  
-- [Streamlit](https://streamlit.io/) – Frontend UI  
-- [Transformers](https://huggingface.co/transformers/) – Vision-Language Model (`Salesforce/blip-image-captioning-base`)  
-- [Pytesseract](https://github.com/madmaze/pytesseract) – OCR for text extraction  
-- [Python 3.9+](https://www.python.org/)  
+## ✨ Features
+- 🔍 Extracts text from images using **Tesseract OCR**  
+- 🤖 Analyzes messages and screenshots for phishing risks with **Vision + Language AI**  
+- ⚡ Runs on **Streamlit** for fast prototyping and interactive UI  
+- 🛡 Helps users stay **cyber-safe in real-time**  
 
 ---
 
-## 📂 Project Structure
+## 🛠 Setup
+
+### 1. Clone the repository
+```bash
+git clone <your-repo-url>
+cd <your-repo-name>
