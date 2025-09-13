@@ -17,5 +17,5 @@ It combines **LFM2-VL (Liquid Foundation Model 2 – Vision Language)** with OCR
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repo-url>
-cd <your-repo-name>
+git clone <ebi-max>
+cd <PhishEye>
