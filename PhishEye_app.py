@@ -1,63 +1,113 @@
-# phisheye_app.py
-
 import streamlit as st
-from PIL import Image
-import pytesseract
-from transformers import pipeline
 
-# Title + Header
-st.set_page_config(page_title="PhishEye 🔍", page_icon="👁️")
-st.title("PhishEye 🔍")
-st.markdown("### Scam Image & Screenshot Detector")
-st.write("Upload a screenshot, fake alert, or receipt, and let AI check if it looks like a scam.")
+# ---------------- PAGE CONFIG ----------------
+st.set_page_config(
+    page_title="PhishEye",
+    page_icon="🐟",
+    layout="centered"
+)
 
-# Upload section
-uploaded_file = st.file_uploader("📂 Upload an image (PNG, JPG, JPEG)", type=["png", "jpg", "jpeg"])
+# ---------------- SESSION STATE ----------------
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
-# Load a HuggingFace Vision-Language pipeline (placeholder for LFM2-VL)
-@st.cache_resource
-def load_model():
-    return pipeline("image-to-text", model="Salesforce/blip-image-captioning-base")
+if "name" not in st.session_state:
+    st.session_state.name = ""
 
-vl_model = load_model()
+# ---------------- LOGIN SCREEN ----------------
+if not st.session_state.logged_in:
+    st.title("🐟 PhishEye")
+    st.caption("AI-assisted phishing detection & cybersecurity awareness")
+    st.markdown("**Powered by Ebiklean Global**")
 
-def scam_detector(extracted_text: str, ai_caption: str):
-    """
-    Basic heuristic scam detection.
-    Expand later with ML classification or fine-tuning.
-    """
-    suspicious_keywords = [
-        "urgent", "bank", "verify", "password", "lottery",
-        "account blocked", "transfer", "click here", "win"
-    ]
-    red_flags = [word for word in suspicious_keywords if word.lower() in extracted_text.lower() or word in ai_caption.lower()]
+    name = st.text_input("Enter your name")
 
-    if red_flags:
-        return "⚠️ Likely Scam", f"Suspicious terms detected: {', '.join(red_flags)}"
-    else:
-        return "✅ Safe", "No obvious scam indicators found."
+    if st.button("Login"):
+        if name.strip() == "":
+            st.warning("Please enter your name to continue.")
+        else:
+            st.session_state.name = name
+            st.session_state.logged_in = True
+            st.rerun()
 
-if uploaded_file is not None:
-    # Display uploaded image
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+# ---------------- MAIN APP ----------------
+else:
+    st.sidebar.success(f"Logged in as {st.session_state.name}")
+    if st.sidebar.button("Logout"):
+        st.session_state.logged_in = False
+        st.rerun()
 
-    with st.spinner("Analyzing with AI..."):
-        # Step 1: Caption the image (visual analysis)
-        caption = vl_model(image)[0]['generated_text']
+    st.title("🐟 PhishEye")
+    st.markdown("**Powered by Ebiklean Global**")
 
-        # Step 2: Extract embedded text using OCR
-        extracted_text = pytesseract.image_to_string(image)
+    st.subheader("Phishing Risk Check")
 
-        # Step 3: Run scam detection logic
-        verdict, explanation = scam_detector(extracted_text, caption)
+    # Risk factors for phishing
+    unknown_links = st.checkbox("Click links from unknown emails")
+    weak_password = st.checkbox("Use weak or repeated passwords")
+    public_wifi = st.checkbox("Use public Wi-Fi without protection")
+    ignore_updates = st.checkbox("Ignore software/OS updates")
 
-    # Show results
-    st.subheader("🔎 Analysis Result")
-    st.write(f"**Verdict:** {verdict}")
-    st.write(f"**Explanation:** {explanation}")
+    if st.button("Check Phishing Risk"):
+        # Convert booleans to numbers
+        link_n = int(unknown_links)
+        pwd_n = int(weak_password)
+        wifi_n = int(public_wifi)
+        update_n = int(ignore_updates)
 
-    # Optional: Show extracted text + AI caption
-    with st.expander("See AI Details"):
-        st.write("**AI Caption:**", caption)
-        st.write("**Extracted Text:**", extracted_text)
+        # Simple risk calculation
+        risk_score = (link_n + pwd_n + wifi_n + update_n) / 4
+
+        st.success("Phishing analysis complete")
+        st.write(f"### Estimated Phishing Risk Score: **{risk_score * 100:.1f}%**")
+
+        if risk_score >= 0.75:
+            st.error("High phishing risk! Take immediate action.")
+        elif risk_score >= 0.4:
+            st.warning("Moderate phishing risk. Improve security habits.")
+        else:
+            st.success("Low phishing risk. Keep practicing good habits.")
+
+        # ---------------- DOWNLOADABLE REPORT ----------------
+        report = f"""
+🐟 PHISHEYE REPORT
+Powered by Ebiklean Global
+
+Name: {st.session_state.name}
+
+Phishing Risk Factors:
+- Clicking Unknown Links: {unknown_links}
+- Weak/Repeated Passwords: {weak_password}
+- Unsafe Public Wi-Fi: {public_wifi}
+- Ignoring Updates: {ignore_updates}
+
+Estimated Phishing Risk Score: {risk_score * 100:.1f}%
+
+Recommendations:
+- Avoid clicking unknown links
+- Use strong, unique passwords
+- Enable 2FA
+- Keep software and OS updated
+- Use VPN on public Wi-Fi
+
+Disclaimer:
+This tool provides phishing awareness only.
+It is NOT a replacement for professional cybersecurity services.
+"""
+
+        st.download_button(
+            label="📥 Download PhishEye Report",
+            data=report,
+            file_name="phisheye_report.txt",
+            mime="text/plain"
+        )
+
+    st.divider()
+    st.subheader("💰 Investor & Impact Overview")
+    st.write(
+        """
+        - Rising demand for phishing & cybersecurity awareness tools  
+        - Suitable for schools, NGOs, SMEs, and individuals  
+        - Scalable across web and mobile platforms  
+        """
+    )
