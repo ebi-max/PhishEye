@@ -1,13 +1,14 @@
 import streamlit as st
 from datetime import datetime
 import json
+import random
 
 # ---------------------------------
 # Page Config
 # ---------------------------------
 st.set_page_config(
-    page_title="PhishEye",
-    page_icon="🎣",
+    page_title="Reddit CyberSafe Game",
+    page_icon="🎮",
     layout="centered"
 )
 
@@ -15,9 +16,9 @@ st.set_page_config(
 # Header / Branding
 # ---------------------------------
 st.markdown("""
-<h2 style="text-align:center;">🎣 PhishEye</h2>
+<h2 style="text-align:center;">🎮 Reddit CyberSafe Game</h2>
 <p style="text-align:center; font-weight:bold;">Powered by Ebiklean Global</p>
-<p style="text-align:center;">AI-powered phishing awareness & detection</p>
+<p style="text-align:center;">Learn cyber safety with interactive challenges</p>
 <hr>
 """, unsafe_allow_html=True)
 
@@ -30,11 +31,17 @@ if "user" not in st.session_state:
 if "chat" not in st.session_state:
     st.session_state.chat = []
 
+if "score" not in st.session_state:
+    st.session_state.score = 0
+
+if "question_index" not in st.session_state:
+    st.session_state.question_index = 0
+
 # ---------------------------------
-# Login (Simple & Safe)
+# Login
 # ---------------------------------
 if st.session_state.user is None:
-    name = st.text_input("Enter your name to continue")
+    name = st.text_input("Enter your name to start playing")
     if st.button("Login"):
         if name.strip():
             st.session_state.user = name
@@ -45,89 +52,76 @@ if st.session_state.user is None:
 
 st.success(f"Welcome, {st.session_state.user} 👋")
 
-# ---------------------------------
-# Notifications
-# ---------------------------------
-st.info("🔔 Tip: Always verify sender addresses and links before clicking.")
+st.info("🔔 Tip: Answer carefully to learn about online safety!")
 
 # ---------------------------------
-# Phishing Check Inputs
+# Quiz / Game Data
 # ---------------------------------
-st.subheader("🎯 Phishing Risk Assessment")
-
-email_type = st.selectbox(
-    "What type of message are you checking?",
-    ["Email", "SMS", "Social Media", "Website Link"]
-)
-
-unknown_sender = st.selectbox(
-    "Is the sender unknown?",
-    ["Yes", "No"]
-)
-
-urgent_tone = st.selectbox(
-    "Does the message create urgency or fear?",
-    ["Yes", "No"]
-)
-
-asks_info = st.selectbox(
-    "Does it ask for personal or financial information?",
-    ["Yes", "No"]
-)
+questions = [
+    {
+        "q": "You receive an email asking for your password. What should you do?",
+        "options": ["Ignore and report", "Reply immediately", "Click the link"],
+        "answer": 0
+    },
+    {
+        "q": "You see a suspicious link on social media. You should:",
+        "options": ["Click it", "Report it or ignore", "Share it with friends"],
+        "answer": 1
+    },
+    {
+        "q": "A website asks for your credit card unexpectedly. You should:",
+        "options": ["Provide info", "Check website security and legitimacy", "Ignore security warnings"],
+        "answer": 1
+    }
+]
 
 # ---------------------------------
-# Classification Logic
+# Display Question
 # ---------------------------------
-def phishing_classifier(sender, urgency, info):
-    if sender == "Yes" and (urgency == "Yes" or info == "Yes"):
-        return "High Risk", "🚨 Likely phishing attempt. Do not interact."
-    elif urgency == "Yes":
-        return "Moderate Risk", "⚠️ Be cautious and verify the source."
-    else:
-        return "Low Risk", "✅ No obvious phishing indicators detected."
+if st.session_state.question_index < len(questions):
+    q_data = questions[st.session_state.question_index]
+    st.subheader(f"❓ Question {st.session_state.question_index + 1}")
+    st.write(q_data["q"])
+    choice = st.radio("Select your answer:", q_data["options"])
 
-# ---------------------------------
-# Run Assessment
-# ---------------------------------
-if st.button("Analyze Message"):
-    risk, advice = phishing_classifier(unknown_sender, urgent_tone, asks_info)
+    if st.button("Submit Answer"):
+        if choice == q_data["options"][q_data["answer"]]:
+            st.success("✅ Correct!")
+            st.session_state.score += 1
+        else:
+            st.error(f"❌ Wrong! Correct answer: {q_data['options'][q_data['answer']]}")
+        st.session_state.question_index += 1
+        st.rerun()
+else:
+    st.subheader("🏆 Game Finished!")
+    st.write(f"Your score: {st.session_state.score} / {len(questions)}")
 
-    st.subheader("🧠 PhishEye Result")
-    st.write(f"**Risk Level:** {risk}")
-    st.write(f"**Advice:** {advice}")
-
-    # ---------- Corrected report dictionary ----------
+    # Download Report
     report = {
         "Name": st.session_state.user,
-        "Message Type": email_type,
-        "Unknown Sender": unknown_sender,
-        "Urgent Tone": urgent_tone,
-        "Requests Info": asks_info,
-        "Risk Level": risk,
-        "Advice": advice,
+        "Score": st.session_state.score,
+        "Total Questions": len(questions),
         "Generated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
-    # Download button
     st.download_button(
-        "📥 Download Phishing Report",
+        "📥 Download Game Report",
         json.dumps(report, indent=4),
-        file_name="phisheye_report.json",
+        file_name="cybersafe_game_report.json",
         mime="application/json"
     )
 
 # ---------------------------------
-# Awareness Gallery
+# Gallery / Hints
 # ---------------------------------
 st.markdown("---")
-st.subheader("🖼 Phishing Awareness Gallery")
-
+st.subheader("🖼 Cyber Safety Hints Gallery")
 st.image(
     [
-        "https://images.unsplash.com/photo-1559136555-9303baea8ebd",
-        "https://images.unsplash.com/photo-1600267165611-6d4a9e3c91d4"
+        "https://images.unsplash.com/photo-1591696331111-77ec7ab4dfe4",
+        "https://images.unsplash.com/photo-1561130794-0b644a4a3f2a"
     ],
-    caption=["Fake Login Pages", "Suspicious Messages"],
+    caption=["Stay alert online", "Verify links and sources"],
     use_column_width=True
 )
 
@@ -135,15 +129,15 @@ st.image(
 # Chat Assistant
 # ---------------------------------
 st.markdown("---")
-st.subheader("💬 PhishEye Assistant Chat")
+st.subheader("💬 Cyber Game Assistant")
 
-user_msg = st.text_input("Ask about phishing or suspicious messages")
+user_msg = st.text_input("Ask about online safety during the game")
 
-if st.button("Send"):
+if st.button("Send Message"):
     if user_msg.strip():
         st.session_state.chat.append(("You", user_msg))
         st.session_state.chat.append(
-            ("AI", "If a message pressures you or asks for sensitive data, it is likely phishing.")
+            ("AI", "Remember: Never share passwords, verify links, and report suspicious messages.")
         )
         st.rerun()
 
@@ -151,28 +145,19 @@ for sender, msg in st.session_state.chat:
     st.write(f"**{sender}:** {msg}")
 
 # ---------------------------------
-# Impact / Investor Dashboard
+# Investor / Impact Dashboard
 # ---------------------------------
 st.markdown("---")
 st.subheader("📊 Impact & Investor Snapshot")
 
 c1, c2, c3 = st.columns(3)
-c1.metric("Threat Type", "Phishing")
-c2.metric("Primary Users", "Internet Users")
-c3.metric("Scalability", "Very High")
+c1.metric("Game Type", "Interactive Quiz")
+c2.metric("Target Users", "Internet Users")
+c3.metric("Scalability", "High")
 
 st.info(
-    "PhishEye helps reduce phishing scams by empowering users with "
-    "early detection and awareness tools."
-)
-
-# ---------------------------------
-# Explore Other Apps
-# ---------------------------------
-st.markdown("---")
-st.subheader("🌍 Explore Other Tools")
-st.markdown(
-    "➡️ **AI CyberSafe Checker** – Digital safety & phishing prevention"
+    "Reddit CyberSafe Game improves awareness of phishing, social engineering, "
+    "and online safety through gamified learning."
 )
 
 # ---------------------------------
