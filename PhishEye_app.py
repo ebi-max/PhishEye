@@ -96,6 +96,7 @@ if st.button("Analyze Message"):
     st.write(f"**Risk Level:** {risk}")
     st.write(f"**Advice:** {advice}")
 
+    # ---------- Corrected report dictionary ----------
     report = {
         "Name": st.session_state.user,
         "Message Type": email_type,
@@ -104,4 +105,82 @@ if st.button("Analyze Message"):
         "Requests Info": asks_info,
         "Risk Level": risk,
         "Advice": advice,
-        "Generated": datetime
+        "Generated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    # Download button
+    st.download_button(
+        "📥 Download Phishing Report",
+        json.dumps(report, indent=4),
+        file_name="phisheye_report.json",
+        mime="application/json"
+    )
+
+# ---------------------------------
+# Awareness Gallery
+# ---------------------------------
+st.markdown("---")
+st.subheader("🖼 Phishing Awareness Gallery")
+
+st.image(
+    [
+        "https://images.unsplash.com/photo-1559136555-9303baea8ebd",
+        "https://images.unsplash.com/photo-1600267165611-6d4a9e3c91d4"
+    ],
+    caption=["Fake Login Pages", "Suspicious Messages"],
+    use_column_width=True
+)
+
+# ---------------------------------
+# Chat Assistant
+# ---------------------------------
+st.markdown("---")
+st.subheader("💬 PhishEye Assistant Chat")
+
+user_msg = st.text_input("Ask about phishing or suspicious messages")
+
+if st.button("Send"):
+    if user_msg.strip():
+        st.session_state.chat.append(("You", user_msg))
+        st.session_state.chat.append(
+            ("AI", "If a message pressures you or asks for sensitive data, it is likely phishing.")
+        )
+        st.rerun()
+
+for sender, msg in st.session_state.chat:
+    st.write(f"**{sender}:** {msg}")
+
+# ---------------------------------
+# Impact / Investor Dashboard
+# ---------------------------------
+st.markdown("---")
+st.subheader("📊 Impact & Investor Snapshot")
+
+c1, c2, c3 = st.columns(3)
+c1.metric("Threat Type", "Phishing")
+c2.metric("Primary Users", "Internet Users")
+c3.metric("Scalability", "Very High")
+
+st.info(
+    "PhishEye helps reduce phishing scams by empowering users with "
+    "early detection and awareness tools."
+)
+
+# ---------------------------------
+# Explore Other Apps
+# ---------------------------------
+st.markdown("---")
+st.subheader("🌍 Explore Other Tools")
+st.markdown(
+    "➡️ **AI CyberSafe Checker** – Digital safety & phishing prevention"
+)
+
+# ---------------------------------
+# Footer
+# ---------------------------------
+st.markdown("""
+<hr>
+<p style="text-align:center; font-size:12px;">
+© 2026 Ebiklean Global • AI for Social Good
+</p>
+""", unsafe_allow_html=True)
